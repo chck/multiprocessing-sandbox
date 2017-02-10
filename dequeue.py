@@ -1,23 +1,29 @@
 # coding:utf-8
 import signal
 import time
-from multiprocessing import Queue
+from multiprocessing import Queue, Process
 
 
-class Dequeue(object):
-    def run(self, q: Queue, stop_flag):
+class Dequeue(Process):
+    def __init__(self, q: Queue, interval: int, stop_flag):
+        super().__init__()
+        self.q = q
+        self.interval = interval
+        self.stop_flag = stop_flag
+
+    def run(self):
         """Signal disable
         """
         signal.signal(signal.SIGINT, signal.SIG_IGN)
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
 
         while True:
-            if stop_flag.is_set():
+            if self.stop_flag.is_set():
                 break
 
-            if not q.empty():
-                print("GET:::{}".format(q.get()))
+            if not self.q.empty():
+                print("GET:::{}".format(self.q.get()))
 
-            time.sleep(1)
+            time.sleep(self.interval)
 
         print("stop enqueuing!!")

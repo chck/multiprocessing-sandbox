@@ -1,6 +1,6 @@
 import signal
 import time
-from multiprocessing import Queue, Event, Process
+from multiprocessing import Queue, Event
 
 from dequeue import Dequeue
 from enqueue import Enqueue
@@ -9,11 +9,8 @@ if __name__ == '__main__':
     queue = Queue()
     stop_flag = Event()
 
-    enqueue = Enqueue()
-    dequeue = Dequeue()
-
-    enqueue_process = Process(target=enqueue.run, args=(queue, stop_flag))
-    dequeue_process = Process(target=dequeue.run, args=(queue, stop_flag))
+    enqueue_process = Enqueue(q=queue, interval=1, stop_flag=stop_flag)
+    dequeue_process = Dequeue(q=queue, interval=1, stop_flag=stop_flag)
 
     [p.start() for p in [enqueue_process, dequeue_process]]
 
@@ -34,4 +31,3 @@ if __name__ == '__main__':
             time.sleep(0.1)
             continue
         break
-
